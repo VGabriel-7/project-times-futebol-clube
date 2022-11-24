@@ -7,4 +7,14 @@ export default class TeamController {
 
     return res.status(200).json(teams);
   }
+
+  public static async getTeam(req: Request, res: Response) {
+    const { id } = req.params;
+
+    const team = await TeamService.getTeam(Number(id));
+
+    if (!team) return res.status(404).json({ message: 'Team not found' });
+
+    return res.status(200).json(team);
+  }
 }

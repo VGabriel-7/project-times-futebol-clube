@@ -11,4 +11,10 @@ export default class TeamService {
 
     return teams;
   }
+
+  public static async getTeam(id: number): Promise<ITeams | null> {
+    const team = await Team.findByPk(id);
+
+    return team;
+  }
 }
