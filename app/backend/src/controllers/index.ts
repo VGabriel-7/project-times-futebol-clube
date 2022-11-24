@@ -1,3 +1,7 @@
-import UserController from './login.controller';
+import UserController from './user.controller';
+import TeamController from './team.controller';
 
-export default UserController;
+export {
+  UserController,
+  TeamController,
+};
