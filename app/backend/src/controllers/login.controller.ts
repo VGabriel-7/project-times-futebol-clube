@@ -6,8 +6,6 @@ export default class UserController {
   public static async login(req: Request, res: Response) {
     const { email, password } = req.body;
 
-    if (!email) return res.status(400).json({ message: 'All fields must be filled' });
-
     const login = await UserService.login({ email, password });
 
     if (!login) return res.status(401).json({ message: 'Incorrect email or password' });
@@ -26,8 +24,6 @@ export default class UserController {
       const jwt = validateTk(authorization);
 
       const role = await UserService.typeUser(jwt.id);
-
-      if (!role) return res.status(401).json({ message: 'Users not found' });
 
       return res.status(200).json(role);
     } catch ({ message }) {

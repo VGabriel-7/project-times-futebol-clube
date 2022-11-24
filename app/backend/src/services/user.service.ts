@@ -27,11 +27,9 @@ export default class UserService {
     return false;
   }
 
-  public static async typeUser(id: number): Promise<IRole | boolean> {
-    const user = await User.findByPk(id);
+  public static async typeUser(id: number): Promise<IRole | null> {
+    const role = await User.findByPk(id, { attributes: ['role'] });
 
-    if (user) return { role: user.role };
-
-    return false;
+    return role;
   }
 }
