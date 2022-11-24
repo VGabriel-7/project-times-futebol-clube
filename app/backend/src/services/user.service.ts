@@ -1,5 +1,5 @@
 import { compareSync } from 'bcryptjs';
-import { IJwt } from '../interfaces';
+import { IJwt, IRole } from '../interfaces';
 import User from '../database/models/UserModel';
 
 interface IUserLogin {
@@ -23,6 +23,14 @@ export default class UserService {
         email: user.email,
       };
     }
+
+    return false;
+  }
+
+  public static async typeUser(id: number): Promise<IRole | boolean> {
+    const user = await User.findByPk(id);
+
+    if (user) return { role: user.role };
 
     return false;
   }

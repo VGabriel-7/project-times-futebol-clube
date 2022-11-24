@@ -15,3 +15,5 @@ export interface IToken {
   iat: number;
   exp: number;
 }
+
+export interface IRole { role: string; }
