@@ -1,3 +1,5 @@
+import Match from '../database/models/MatchModel';
+
 export interface IJwt {
   id: number;
   username: string;
@@ -17,3 +19,8 @@ export interface IToken {
 }
 
 export interface IRole { role: string; }
+
+export interface IResponseMatches extends Match {
+  teamHome: object,
+  teamAway: object,
+}

@@ -9,11 +9,14 @@ import {
   mockBodyLogin,
   mockReturnModelLogin,
   mockReturnModelAuth,
-  mockHeadersLogin,
+  mockJWTValidateTk,
+  validToken,
 } from './mocks/bodyLogin';
 import * as bcrypt from 'bcryptjs';
 
 import { Response } from 'superagent';
+import { UserController } from '../controllers';
+import * as JWT from '../utils/JWT'
 
 chai.use(chaiHttp);
 
@@ -66,16 +69,16 @@ describe('Rota de login/validate', () => {
 
   let chaiHttpResponse: Response;
 
-  beforeEach(async () => {
-    sinon
-      .stub(User, "findByPk")
-      .resolves(mockReturnModelAuth as User);
-  });
-
   afterEach(sinon.restore)
 
   it('Retorna { role: admin } e status 200 ao usar a rota /login/validate com token valido', async () => {
-    chaiHttpResponse = await chai.request(app).get('/login/validate').set({ Authorization: mockHeadersLogin.token });
+    sinon
+      .stub(JWT, "validateTk")
+      .resolves(mockJWTValidateTk);
+    sinon
+      .stub(User, "findByPk")
+      .resolves({ role: 'admin' } as User);
+    chaiHttpResponse = await chai.request(app).get('/login/validate').set({ Authorization: validToken });
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);
     expect(chaiHttpResponse.body).to.deep.equal({ role: 'admin' });

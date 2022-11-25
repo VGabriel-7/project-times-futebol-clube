@@ -31,7 +31,7 @@ Match.init({
     allowNull: false,
     type: INTEGER,
   },
-  awayTeamsGoals: {
+  awayTeamGoals: {
     allowNull: false,
     type: INTEGER,
   },
@@ -52,10 +52,10 @@ Match.init({
   * Associations 1:N devem ficar em uma das instâncias de modelo
   * */
 
-Team.belongsTo(Match, { foreignKey: 'home_team', as: 'homeTeams' });
-Team.belongsTo(Match, { foreignKey: 'away_team', as: 'awayTeams' });
+Match.belongsTo(Team, { foreignKey: 'homeTeam', as: 'teamHome' });
+Match.belongsTo(Team, { foreignKey: 'awayTeam', as: 'teamAway' });
 
-Match.hasMany(Team, { foreignKey: 'id', as: 'homeTeams' });
-Match.hasMany(Team, { foreignKey: 'id', as: 'awayTeams' });
+Team.hasMany(Match, { foreignKey: 'homeTeam', as: 'teamHome' });
+Team.hasMany(Match, { foreignKey: 'awayTeam', as: 'teamAway' });
 
 export default Match;
