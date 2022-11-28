@@ -7,7 +7,7 @@ import App from '../app';
 import Match from '../database/models/MatchModel';
 
 import { Response } from 'superagent';
-import { responseMatches, matchesInProgress } from './mocks/mockMatches';
+import { responseMatches, matchesInProgress, matchesNotInProgress } from './mocks/mockMatches';
 import { IResponseMatches } from '../interfaces';
 
 chai.use(chaiHttp);
@@ -51,12 +51,25 @@ describe('Rota de Matches com query', () => {
       .resolves(matchesInProgress as IResponseMatches[]);
   });
 
-  afterEach(sinon.restore)
+  afterEach(()=>{
+    (Match.findAll as sinon.SinonStub).restore();
+  })
 
   it('Retorna um array de partidas em progresso e status 200 ao fazer a requisicao na rota /matches?inProgress=true', async () => {
     chaiHttpResponse = await chai.request(app).get('/matches').query({ inProgress: true });
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);
     expect(chaiHttpResponse.body).to.deep.equal(matchesInProgress);
+  });
+
+  it('Retorna um array de partidas encerradas e status 200 ao fazer a requisicao na rota /matches?inProgress=false', async () => {
+    (Match.findAll as sinon.SinonStub).restore();
+    sinon
+      .stub(Match, "findAll")
+      .resolves(matchesNotInProgress as IResponseMatches[]);
+    chaiHttpResponse = await chai.request(app).get('/matches').query({ inProgress: false });
+
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);
+    expect(chaiHttpResponse.body).to.deep.equal(matchesNotInProgress);
   });
 });

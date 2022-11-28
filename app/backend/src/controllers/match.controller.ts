@@ -10,6 +10,10 @@ export default class MatchController {
         const matchesInProgress = await MatchService.getAllMatchesInProgress();
 
         return res.status(200).json(matchesInProgress);
+      } if (inProgress === 'false') {
+        const closedMatches = await MatchService.getAllClosedMatches();
+
+        return res.status(200).json(closedMatches);
       }
 
       const matches = await MatchService.getAllMatches();
