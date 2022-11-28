@@ -3,8 +3,20 @@ import MatchService from '../services/match.service';
 
 export default class MatchController {
   public static async getAllMatches(req: Request, res: Response) {
-    const matches = await MatchService.getAllMatches();
+    const { inProgress } = req.query;
 
-    return res.status(200).json(matches);
+    try {
+      if (inProgress === 'true') {
+        const matchesInProgress = await MatchService.getAllMatchesInProgress();
+
+        return res.status(200).json(matchesInProgress);
+      }
+
+      const matches = await MatchService.getAllMatches();
+
+      return res.status(200).json(matches);
+    } catch (err) {
+      res.status(500).json({ message: err });
+    }
   }
 }
