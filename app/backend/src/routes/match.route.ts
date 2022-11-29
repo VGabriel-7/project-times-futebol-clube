@@ -5,4 +5,6 @@ const route = express.Router();
 
 route.get('/', MatchController.getAllMatches);
 
+route.post('/', MatchController.updateMatch);
+
 export default route;

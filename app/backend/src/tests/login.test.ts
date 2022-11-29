@@ -8,14 +8,12 @@ import User from '../database/models/UserModel';
 import {
   mockBodyLogin,
   mockReturnModelLogin,
-  mockReturnModelAuth,
   mockJWTValidateTk,
   validToken,
 } from './mocks/bodyLogin';
 import * as bcrypt from 'bcryptjs';
 
 import { Response } from 'superagent';
-import { UserController } from '../controllers';
 import * as JWT from '../utils/JWT'
 
 chai.use(chaiHttp);
