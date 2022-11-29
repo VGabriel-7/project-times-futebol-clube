@@ -43,10 +43,20 @@ export default class MatchController {
   public static async endMatch(req: Request, res: Response) {
     const { id } = req.params;
 
-    const finshedMatch = await MatchService.updateMatch(Number(id));
+    const finshedMatch = await MatchService.endMatch(Number(id));
 
     if (!finshedMatch) return res.status(400).json({ message: 'Match not found' });
 
     return res.status(200).json(finshedMatch);
+  }
+
+  public static async updateMatchInProgress(req: Request, res: Response) {
+    const { id } = req.params;
+
+    const updatedMatch = await MatchService.updateMatchInProgress(Number(id), req.body);
+
+    if (!updatedMatch) return res.status(404).json({ message: 'Match not found' });
+
+    return res.status(200).json(updatedMatch);
   }
 }

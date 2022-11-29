@@ -1,17 +1,14 @@
 import { compareSync } from 'bcryptjs';
-import { IJwt, IRole } from '../interfaces';
+import { IJwt, IRole, IUserLogin } from '../interfaces';
 import User from '../database/models/UserModel';
 
-interface IUserLogin {
-  email: string;
-  password: string;
-}
-
 export default class UserService {
-  public static async login(userLogin: IUserLogin): Promise<IJwt | boolean> {
+  constructor(private user = User) {}
+
+  public async login(userLogin: IUserLogin): Promise<IJwt | boolean> {
     const { email, password } = userLogin;
 
-    const user = await User.findOne({ where: { email } });
+    const user = await this.user.findOne({ where: { email } });
 
     const logged = user && compareSync(password, user.password);
 
@@ -27,8 +24,8 @@ export default class UserService {
     return false;
   }
 
-  public static async typeUser(id: number): Promise<IRole | null> {
-    const role = await User.findByPk(id, { attributes: ['role'] });
+  public async typeUser(id: number): Promise<IRole | null> {
+    const role = await this.user.findByPk(id, { attributes: ['role'] });
 
     return role;
   }

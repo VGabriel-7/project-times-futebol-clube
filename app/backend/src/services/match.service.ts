@@ -1,4 +1,10 @@
-import { IReturnPutMatches, IParamsCreateMatches, IReturnUpdateMatches } from '../interfaces';
+import {
+  IReturnPutMatches,
+  IParamsCreateMatches,
+  IReturnUpdateMatches,
+  IParamsUpdateMatchInProgress,
+  IReturnMatchInProgress,
+} from '../interfaces';
 import Match from '../database/models/MatchModel';
 import Team from '../database/models/TeamModel';
 
@@ -58,13 +64,26 @@ export default class MatchService {
     return dataValues;
   }
 
-  public static async updateMatch(id: number):
+  public static async endMatch(id: number):
   Promise<IReturnUpdateMatches | boolean> {
     const finshedMatch = await Match.update({ inProgress: 0 }, {
       where: { id },
     });
 
     if (finshedMatch[0] === 1) return { message: 'Finished' };
+
+    return false;
+  }
+
+  public static async updateMatchInProgress(id: number, updates: IParamsUpdateMatchInProgress):
+  Promise<IReturnMatchInProgress | boolean> {
+    const { homeTeamGoals, awayTeamGoals } = updates;
+
+    const updatedMatch = await Match.update({ homeTeamGoals, awayTeamGoals }, {
+      where: { id },
+    });
+
+    if (updatedMatch[0] === 1) return { message: 'Match updated' };
 
     return false;
   }

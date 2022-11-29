@@ -26,7 +26,7 @@ const HTTP_STATUS_OK = 200;
 const HTTP_BAD_REQUEST = 400;
 const HTTP_UNAUTHORIZED = 401;
 
-describe('Rota de Login', () => {
+describe('Rota /login', () => {
 
   let chaiHttpResponse: Response;
 
@@ -63,13 +63,13 @@ describe('Rota de Login', () => {
   });
 });
 
-describe('Rota de login/validate', () => {
+describe('Rota login/validate', () => {
 
   let chaiHttpResponse: Response;
 
   afterEach(sinon.restore)
 
-  it('Retorna { role: admin } e status 200 ao usar a rota /login/validate com token valido', async () => {
+  it('Retorna { role: admin } e status 200 com token valido', async () => {
     sinon
       .stub(JWT, "validateTk")
       .resolves(mockJWTValidateTk);
@@ -82,14 +82,14 @@ describe('Rota de login/validate', () => {
     expect(chaiHttpResponse.body).to.deep.equal({ role: 'admin' });
   });
 
-  it('Retorna "Invalid token" e status 400 ao usar a rota /login/validate com token invalido', async () => {
+  it('Retorna "Invalid token" e status 400 com token invalido', async () => {
     chaiHttpResponse = await chai.request(app).get('/login/validate').set({ Authorization: 'xaolinmatadordeporco' });
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_UNAUTHORIZED);
     expect(chaiHttpResponse.body).to.deep.equal({ message: 'Invalid token' });
   });
 
-  it('Retorna "Token required for validation" e status 400 ao usar a rota /login/validate sem um token', async () => {
+  it('Retorna "Token required for validation" e status 400 sem um token', async () => {
     chaiHttpResponse = await chai.request(app).get('/login/validate').set({ });
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_BAD_REQUEST);

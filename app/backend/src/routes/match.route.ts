@@ -15,6 +15,8 @@ route.post(
   MatchController.createMatch,
 );
 
+route.patch('/:id', MatchController.updateMatchInProgress);
+
 route.patch('/:id/finish', MatchController.endMatch);
 
 export default route;

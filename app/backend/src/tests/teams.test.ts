@@ -21,7 +21,7 @@ const HTTP_NOT_FOUND = 404;
 // const HTTP_BAD_REQUEST = 400;
 // const HTTP_UNAUTHORIZED = 401;
 
-describe('Rota de Teams', () => {
+describe('Rota /teams', () => {
 
   let chaiHttpResponse: Response;
 
@@ -33,14 +33,14 @@ describe('Rota de Teams', () => {
 
   afterEach(sinon.restore)
 
-  it('Retorna um array com times e status 200 ao fazer a requisicao na rota /teams', async () => {
+  it('Retorna um array com times e status 200', async () => {
     chaiHttpResponse = await chai.request(app).get('/teams');
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);
     expect(chaiHttpResponse.body).to.deep.equal(bodyTeams);
   });
 
-  it('Retorna um time e status 200 ao fazer a requisicao na rota /teams/:id', async () => {
+  it('Retorna um time e status 200', async () => {
     sinon
       .stub(Team, "findByPk")
       .resolves(bodyTeams[0] as Team);
@@ -50,7 +50,7 @@ describe('Rota de Teams', () => {
     expect(chaiHttpResponse.body).to.deep.equal(bodyTeams[0]);
   });
 
-  it('Retorna { message: "Team not found" } e status 404 ao fazer a requisicao na rota /teams/:id', async () => {
+  it('Retorna { message: "Team not found" } e status 404', async () => {
     sinon
       .stub(Team, "findByPk")
       .resolves(null)

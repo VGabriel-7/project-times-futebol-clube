@@ -41,6 +41,16 @@ export interface IReturnPutMatches {
   inProgress: boolean;
 }
 
+export interface IUserLogin {
+  email: string;
+  password: string;
+}
+
+export interface IUserService {
+  login(userLogin: IUserLogin): Promise<IJwt | boolean>
+  typeUser(id: number): Promise<IRole | null>
+}
+
 export interface IParamsCreateMatches {
   id: number;
   homeTeam: number;
@@ -50,3 +60,12 @@ export interface IParamsCreateMatches {
 }
 
 export interface IReturnUpdateMatches { message: string }
+
+export interface IParamsUpdateMatchInProgress {
+  homeTeamGoals: string;
+  awayTeamGoals: string;
+}
+
+export interface IReturnMatchInProgress {
+  message: string;
+}
