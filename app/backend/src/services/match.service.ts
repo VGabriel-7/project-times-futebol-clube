@@ -1,4 +1,4 @@
-import { IReturnPutMatches, IParamsUpdateMatches } from '../interfaces';
+import { IReturnPutMatches, IParamsCreateMatches, IReturnUpdateMatches } from '../interfaces';
 import Match from '../database/models/MatchModel';
 import Team from '../database/models/TeamModel';
 
@@ -40,12 +40,12 @@ export default class MatchService {
     return matchesInProgress;
   }
 
-  public static async updateMatch({
+  public static async createMatch({
     homeTeam,
     awayTeam,
     homeTeamGoals,
     awayTeamGoals,
-  }: IParamsUpdateMatches):
+  }: IParamsCreateMatches):
     Promise<IReturnPutMatches> {
     const dataValues = await Match.create({
       homeTeam,
@@ -56,5 +56,16 @@ export default class MatchService {
     });
 
     return dataValues;
+  }
+
+  public static async updateMatch(id: number):
+  Promise<IReturnUpdateMatches | boolean> {
+    const finshedMatch = await Match.update({ inProgress: 0 }, {
+      where: { id },
+    });
+
+    if (finshedMatch[0] === 1) return { message: 'Finished' };
+
+    return false;
   }
 }

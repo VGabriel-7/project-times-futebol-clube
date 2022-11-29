@@ -28,7 +28,7 @@ const HTTP_CREATED = 201;
 const HTTP_BAD_REQUEST = 400;
 // const HTTP_UNAUTHORIZED = 401;
 
-describe('Rota de Matches GET', () => {
+describe('Rota de Matches', () => {
 
   let chaiHttpResponse: Response;
 
@@ -46,9 +46,34 @@ describe('Rota de Matches GET', () => {
     expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);
     expect(chaiHttpResponse.body).to.deep.equal(responseMatches);
   });
+
+  it('Retorna um array de partidas e status 201 ao fazer a requisicao na rota /matches', async () => {
+    sinon
+      .stub(JWT, "validateTk")
+      .returns(mockJWTValidateTk);
+    sinon
+    .stub(Match, "create")
+    .resolves(returnPutMatches as Match);
+    chaiHttpResponse = await chai.request(app).post('/matches').set({ Authorization: validToken })
+    .send({
+      homeTeam: 16,
+      awayTeam: 8,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2 });
+
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_CREATED);
+    expect(chaiHttpResponse.body).to.deep.equal(returnPutMatches);
+  });
+
+  it('Retorna { message: Token required for validation } e status 400 ao fazer a requisicao na rota /matches sem um token de autorizacao', async () => {
+    chaiHttpResponse = await chai.request(app).post('/matches');
+
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_BAD_REQUEST);
+    expect(chaiHttpResponse.body).to.deep.equal({ message: 'Token required for validation' });
+  });
 });
 
-describe('Rota de Matches GET com query', () => {
+describe('Rota de Matches com query', () => {
 
   let chaiHttpResponse: Response;
 
@@ -81,42 +106,31 @@ describe('Rota de Matches GET com query', () => {
   });
 });
 
-describe('Rota Matches  POST', () => {
+describe('Rota de Matches Finished', () => {
 
   let chaiHttpResponse: Response;
 
-  beforeEach(async () => {
-    sinon
-      .stub(Match, "findAll")
-      .resolves(matchesInProgress as IResponseMatches[]);
-  });
-
   afterEach(()=>{
-    (Match.findAll as sinon.SinonStub).restore();
+    (Match.update as sinon.SinonStub).restore();
   })
 
-  it('Retorna um array de partidas e status 201 ao fazer a requisicao na rota /matches', async () => {
+  it('Retorna { message: Finished } e status 200 ao fazer a requisicao na rota /matches/:id/finish', async () => {
     sinon
-      .stub(JWT, "validateTk")
-      .returns(mockJWTValidateTk);
-    sinon
-    .stub(Match, "create")
-    .resolves(returnPutMatches as Match);
-    chaiHttpResponse = await chai.request(app).post('/matches').set({ Authorization: validToken })
-    .send({
-      homeTeam: 16,
-      awayTeam: 8,
-      homeTeamGoals: 2,
-      awayTeamGoals: 2 });
+      .stub(Match, "update")
+      .resolves([1]);
+    chaiHttpResponse = await chai.request(app).patch('/matches/1/finish');
 
-    expect(chaiHttpResponse.status).to.be.eq(HTTP_CREATED);
-    expect(chaiHttpResponse.body).to.deep.equal(returnPutMatches);
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);
+    expect(chaiHttpResponse.body).to.deep.equal({ message: 'Finished' });
   });
 
-  it('Retorna { message: Token required for validation } e status 400 ao fazer a requisicao na rota /matches sem um token de autorizacao', async () => {
-    chaiHttpResponse = await chai.request(app).post('/matches');
+  it('Retorna { message: Match not found } e status 400 ao fazer a requisicao na rota /matches/:id/finish com um id inexistente', async () => {
+    sinon
+      .stub(Match, "update")
+      .resolves([0]);
+    chaiHttpResponse = await chai.request(app).patch('/matches/1/finish');
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_BAD_REQUEST);
-    expect(chaiHttpResponse.body).to.deep.equal({ message: 'Token required for validation' });
+    expect(chaiHttpResponse.body).to.deep.equal({ message: 'Match not found' });
   });
 });

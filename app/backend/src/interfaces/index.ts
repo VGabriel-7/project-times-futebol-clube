@@ -41,10 +41,12 @@ export interface IReturnPutMatches {
   inProgress: boolean;
 }
 
-export interface IParamsUpdateMatches {
+export interface IParamsCreateMatches {
   id: number;
   homeTeam: number;
   awayTeam: number;
   homeTeamGoals: number;
   awayTeamGoals: number;
 }
+
+export interface IReturnUpdateMatches { message: string }
