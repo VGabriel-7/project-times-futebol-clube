@@ -38,7 +38,7 @@ export default class MatchController {
       return res.status(201).json(matches);
     } catch ({ message }) {
       if (message === 'Invalid token') return res.status(400).json({ message });
-      res.status(500).json({ message: 'caiu aqui' });
+      res.status(500).json({ message });
     }
   }
 }

@@ -7,7 +7,12 @@ import App from '../app';
 import Match from '../database/models/MatchModel';
 
 import { Response } from 'superagent';
-import { responseMatches, matchesInProgress, matchesNotInProgress, returnPutMatches, bodyPutMatches } from './mocks/mockMatches';
+import {
+  responseMatches,
+  matchesInProgress,
+  matchesNotInProgress,
+  returnPutMatches,
+  bodyPutMatches } from './mocks/mockMatches';
 import { IResponseMatches, IReturnPutMatches } from '../interfaces';
 import * as JWT from '../utils/JWT'
 import { mockJWTValidateTk, validToken } from './mocks/bodyLogin';
@@ -20,7 +25,7 @@ const { expect } = chai;
 
 const HTTP_STATUS_OK = 200;
 const HTTP_CREATED = 201;
-// const HTTP_BAD_REQUEST = 400;
+const HTTP_BAD_REQUEST = 400;
 // const HTTP_UNAUTHORIZED = 401;
 
 describe('Rota de Matches GET', () => {
@@ -96,14 +101,7 @@ describe('Rota Matches  POST', () => {
       .returns(mockJWTValidateTk);
     sinon
     .stub(Match, "create")
-    .resolves({
-      id: 1,
-      homeTeam: 16,
-      homeTeamGoals: 2,
-      awayTeam: 8,
-      awayTeamGoals: 2,
-      inProgress: true,
-    } as Match);
+    .resolves(returnPutMatches as Match);
     chaiHttpResponse = await chai.request(app).post('/matches').set({ Authorization: validToken })
     .send({
       homeTeam: 16,
@@ -112,6 +110,13 @@ describe('Rota Matches  POST', () => {
       awayTeamGoals: 2 });
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_CREATED);
-    expect(chaiHttpResponse.body).to.deep.equal('');
+    expect(chaiHttpResponse.body).to.deep.equal(returnPutMatches);
+  });
+
+  it('Retorna { message: Token required for validation } e status 400 ao fazer a requisicao na rota /matches sem um token de autorizacao', async () => {
+    chaiHttpResponse = await chai.request(app).post('/matches');
+
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_BAD_REQUEST);
+    expect(chaiHttpResponse.body).to.deep.equal({ message: 'Token required for validation' });
   });
 });

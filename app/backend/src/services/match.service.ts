@@ -47,7 +47,7 @@ export default class MatchService {
     awayTeamGoals,
   }: IParamsUpdateMatches):
     Promise<IReturnPutMatches> {
-    const { dataValues } = await Match.create({
+    const dataValues = await Match.create({
       homeTeam,
       awayTeam,
       homeTeamGoals,
