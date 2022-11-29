@@ -28,17 +28,15 @@ export default class MatchController {
   public static async createMatch(req: Request, res: Response) {
     const { authorization } = req.headers;
 
-    if (!authorization) return res.status(400).json({ message: 'Token required for validation' });
-
     try {
-      validateTk(authorization);
+      validateTk(authorization as string);
 
       const matches = await MatchService.createMatch(req.body);
 
       return res.status(201).json(matches);
     } catch ({ message }) {
       if (message === 'Invalid token') return res.status(400).json({ message });
-      res.status(500).json({ message });
+      return res.status(500).json({ message });
     }
   }
 
@@ -49,6 +47,6 @@ export default class MatchController {
 
     if (!finshedMatch) return res.status(400).json({ message: 'Match not found' });
 
-    res.status(200).json(finshedMatch);
+    return res.status(200).json(finshedMatch);
   }
 }

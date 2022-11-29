@@ -1,0 +1,41 @@
+import { NextFunction, Request, Response } from 'express';
+import { validateTk } from '../utils';
+import TeamService from '../services/team.service';
+
+const HTTP_UNPROCESSABLE_ENTITY = 422;
+const HTTP_NOT_FOUND = 404;
+const HTTP_UNAUTHORIZED = 401;
+
+export default class MatchMiddleware {
+  public static async verifyInfoToCreateMatch(req: Request, res: Response, next: NextFunction) {
+    const { homeTeam, awayTeam } = req.body;
+
+    const thereIsAMatch = await TeamService.getTeam(Number(homeTeam));
+    const thereIsAMatch2 = await TeamService.getTeam(Number(awayTeam));
+
+    if (!thereIsAMatch || !thereIsAMatch2) {
+      return res.status(HTTP_NOT_FOUND).json({
+        message: 'There is no team with such id!' });
+    }
+
+    if (homeTeam === awayTeam) {
+      return res.status(HTTP_UNPROCESSABLE_ENTITY).json({
+        message: 'It is not possible to create a match with two equal teams',
+      });
+    }
+
+    next();
+  }
+
+  public static async verifyToken(req: Request, res: Response, next: NextFunction) {
+    const { authorization } = req.headers;
+
+    try {
+      validateTk(authorization as string);
+
+      next();
+    } catch (error) {
+      res.status(HTTP_UNAUTHORIZED).json({ message: 'Token must be a valid token' });
+    }
+  }
+}

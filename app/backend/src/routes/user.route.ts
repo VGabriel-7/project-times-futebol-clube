@@ -1,5 +1,5 @@
 import * as express from 'express';
-import UserMiddleware from '../middlewares/loginVerify.middleware';
+import { UserMiddleware } from '../middlewares';
 import { UserController } from '../controllers';
 
 const route = express.Router();

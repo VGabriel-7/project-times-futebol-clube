@@ -26,7 +26,9 @@ const { expect } = chai;
 const HTTP_STATUS_OK = 200;
 const HTTP_CREATED = 201;
 const HTTP_BAD_REQUEST = 400;
-// const HTTP_UNAUTHORIZED = 401;
+const HTTP_UNPROCESSABLE_ENTITY = 422;
+const HTTP_NOT_FOUND = 404;
+const HTTP_UNAUTHORIZED = 401;
 
 describe('Rota de Matches', () => {
 
@@ -40,6 +42,18 @@ describe('Rota de Matches', () => {
 
   afterEach(sinon.restore)
 
+  it('Retorna { message: Token must be a valid token } e status 401 ao fazer a requisicao na rota /matches sem um token de autorizacao', async () => {
+    chaiHttpResponse = await chai.request(app).post('/matches').send({
+      homeTeam: 16,
+      awayTeam: 8,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2
+    });
+    
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_UNAUTHORIZED);
+    expect(chaiHttpResponse.body).to.deep.equal({ message: 'Token must be a valid token' });
+  });
+
   it('Retorna um array de partidas e status 200 ao fazer a requisicao na rota /matches', async () => {
     chaiHttpResponse = await chai.request(app).get('/matches');
 
@@ -47,7 +61,7 @@ describe('Rota de Matches', () => {
     expect(chaiHttpResponse.body).to.deep.equal(responseMatches);
   });
 
-  it('Retorna um array de partidas e status 201 ao fazer a requisicao na rota /matches', async () => {
+  it('Retorna os infos de um Match criado e status 201 ao fazer a requisicao na rota /matches', async () => {
     sinon
       .stub(JWT, "validateTk")
       .returns(mockJWTValidateTk);
@@ -65,11 +79,40 @@ describe('Rota de Matches', () => {
     expect(chaiHttpResponse.body).to.deep.equal(returnPutMatches);
   });
 
-  it('Retorna { message: Token required for validation } e status 400 ao fazer a requisicao na rota /matches sem um token de autorizacao', async () => {
-    chaiHttpResponse = await chai.request(app).post('/matches');
+  it('Retorna uma mensagem de erro e status 422 ao fazer a requisicao na rota /matches com awayTem e homeTeam iguais', async () => {
+    sinon
+      .stub(JWT, "validateTk")
+      .returns(mockJWTValidateTk);
+    sinon
+    .stub(Match, "create")
+    .resolves(returnPutMatches as Match);
+    chaiHttpResponse = await chai.request(app).post('/matches').set({ Authorization: validToken })
+    .send({
+      homeTeam: 16,
+      awayTeam: 16,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2 });
 
-    expect(chaiHttpResponse.status).to.be.eq(HTTP_BAD_REQUEST);
-    expect(chaiHttpResponse.body).to.deep.equal({ message: 'Token required for validation' });
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_UNPROCESSABLE_ENTITY);
+    expect(chaiHttpResponse.body).to.deep.equal({ message: 'It is not possible to create a match with two equal teams' });
+  });
+
+  it('Retorna uma mensagem de erro e status 404 ao fazer a requisicao na rota /matches com awayTem e homeTeam inexistentes', async () => {
+    sinon
+      .stub(JWT, "validateTk")
+      .returns(mockJWTValidateTk);
+    sinon
+    .stub(Match, "create")
+    .resolves(returnPutMatches as Match);
+    chaiHttpResponse = await chai.request(app).post('/matches').set({ Authorization: validToken })
+    .send({
+      homeTeam: 999999,
+      awayTeam: 16,
+      homeTeamGoals: 2,
+      awayTeamGoals: 2 });
+
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_NOT_FOUND);
+    expect(chaiHttpResponse.body).to.deep.equal({ message: 'There is no team with such id!' });
   });
 });
 

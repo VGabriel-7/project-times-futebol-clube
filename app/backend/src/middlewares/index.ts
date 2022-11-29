@@ -1,3 +1,7 @@
 import UserMiddleware from './loginVerify.middleware';
+import MatchMiddleware from './equalTeamsVefiry.middleware';
 
-export default UserMiddleware;
+export {
+  UserMiddleware,
+  MatchMiddleware,
+};
