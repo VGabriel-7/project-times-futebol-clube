@@ -1,5 +1,3 @@
-import Match from '../database/models/MatchModel';
-
 export interface IJwt {
   id: number;
   username: string;
@@ -19,11 +17,6 @@ export interface IToken {
 }
 
 export interface IRole { role: string; }
-
-export interface IResponseMatches extends Match {
-  teamHome: object,
-  teamAway: object,
-}
 
 export interface IBodyPutMatches {
   homeTeam: number;
@@ -51,6 +44,10 @@ export interface IUserService {
   typeUser(id: number): Promise<IRole | null>
 }
 
+export interface ILeaderboardService {
+  overAll(): Promise<IReturnFilterTimeRatings[]>
+}
+
 export interface IParamsCreateMatches {
   id: number;
   homeTeam: number;
@@ -68,4 +65,17 @@ export interface IParamsUpdateMatchInProgress {
 
 export interface IReturnMatchInProgress {
   message: string;
+}
+
+export interface IReturnFilterTimeRatings {
+  name: string;
+  totalPoints: number;
+  totalGames: number;
+  totalVictories: number;
+  totalDraws: number;
+  totalLosses: number;
+  goalsFavor: number;
+  goalsOwn: number;
+  goalsBalance: number;
+  efficiency: number;
 }

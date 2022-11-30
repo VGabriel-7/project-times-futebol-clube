@@ -3,6 +3,7 @@ import {
   userRoute,
   teamRoute,
   matchRoute,
+  leaderboardRoute,
 } from './routes';
 
 class App {
@@ -31,6 +32,7 @@ class App {
     this.app.use('/login', userRoute);
     this.app.use('/teams', teamRoute);
     this.app.use('/matches', matchRoute);
+    this.app.use('/leaderboard', leaderboardRoute);
   }
 
   public start(PORT: string | number):void {

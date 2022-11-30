@@ -12,7 +12,6 @@ import {
   matchesInProgress,
   matchesNotInProgress,
   returnPutMatches } from './mocks/mockMatches';
-import { IResponseMatches } from '../interfaces';
 import * as JWT from '../utils/JWT'
 import { mockJWTValidateTk, validToken } from './mocks/bodyLogin';
 
@@ -36,7 +35,7 @@ describe('Rota /matches', () => {
   beforeEach(async () => {
     sinon
       .stub(Match, "findAll")
-      .resolves(responseMatches as IResponseMatches[]);
+      .resolves(responseMatches as Match[]);
   });
 
   afterEach(sinon.restore)
@@ -155,7 +154,7 @@ describe('Rota de /matches com query', () => {
   beforeEach(async () => {
     sinon
       .stub(Match, "findAll")
-      .resolves(matchesInProgress as IResponseMatches[]);
+      .resolves(matchesInProgress as Match[]);
   });
 
   afterEach(()=>{
@@ -173,7 +172,7 @@ describe('Rota de /matches com query', () => {
     (Match.findAll as sinon.SinonStub).restore();
     sinon
       .stub(Match, "findAll")
-      .resolves(matchesNotInProgress as IResponseMatches[]);
+      .resolves(matchesNotInProgress as Match[]);
     chaiHttpResponse = await chai.request(app).get('/matches').query({ inProgress: false });
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);

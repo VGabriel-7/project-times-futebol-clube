@@ -3,6 +3,14 @@ import db from '.';
 import Team from './TeamModel';
 // import OtherModel from './OtherModel';
 
+type teamHome = {
+  teamName: string
+};
+
+type teamAway = {
+  teamName: string
+};
+
 class Match extends Model {
   declare id: number;
   declare homeTeam: number;
@@ -10,6 +18,8 @@ class Match extends Model {
   declare awayTeam: number;
   declare awayTeamGoals: number;
   declare inProgress: boolean;
+  declare teamHome: teamHome;
+  declare teamAway: teamAway;
 }
 
 Match.init({
