@@ -2,13 +2,13 @@ export const responseLeaderboardHome = [
   {
     name: 'Internacional',
     totalPoints: 6,
-    totalGames: 1,
+    totalGames: 2,
     totalVictories: 2,
     totalDraws: 0,
     totalLosses: 0,
     goalsFavor: 2,
-    goalsOwn: 1,
-    goalsBalance: 1,
+    goalsOwn: 0,
+    goalsBalance: 2,
     efficiency: 100
   },
   {
@@ -68,9 +68,19 @@ export const returnFindAllMatches = [
     teamAway: { teamName: 'Botafogo' }
   },
   {
-    id: 3,
-    homeTeam: 0,
+    id: 2,
+    homeTeam: 1,
     homeTeamGoals: 1,
+    awayTeam: 14,
+    awayTeamGoals: 0,
+    inProgress: false,
+    teamHome: { teamName: 'Internacional' },
+    teamAway: { teamName: 'Botafogo' }
+  },
+  {
+    id: 3,
+    homeTeam: 3,
+    homeTeamGoals: 0,
     awayTeam: 14,
     awayTeamGoals: 50,
     inProgress: false,
