@@ -5,29 +5,20 @@ import Match from '../database/models/MatchModel';
 
 export default class LeaderboardService {
   private _user = User;
-  private _teams: Team[] = [];
   private _matches: Match[] = [];
-
-  constructor() {
-    this.teams();
-    this.matches();
+  private _teams: Team[] = [];
+  static async teams() {
+    return Team.findAll();
   }
 
-  async teams() {
-    this._teams = await Team.findAll();
-
-    return this._teams;
-  }
-
-  async matches() {
-    this._matches = await Match.findAll({
+  static async matches() {
+    return Match.findAll({
       where: { inProgress: false },
       include: [
         { model: Team, as: 'teamHome', attributes: { exclude: ['id'] } },
         { model: Team, as: 'teamAway', attributes: { exclude: ['id'] } },
       ],
     });
-    return this._matches;
   }
 
   private calculateTotalPoints(teamName: string): number {
@@ -102,7 +93,8 @@ export default class LeaderboardService {
   }
 
   private calculateGoalsBalance(teamName: string): number {
-    return this.calculateTotalGoalsFavor(teamName) - this.calculateTotalGoalsOwn(teamName);
+    return this.calculateTotalGoalsFavor(teamName)
+    - this.calculateTotalGoalsOwn(teamName);
   }
 
   private calculateEfficiency(teamName: string): number {
@@ -115,6 +107,8 @@ export default class LeaderboardService {
   }
 
   public async overAll(): Promise<IReturnFilterTimeRatings[]> {
+    this._teams = await LeaderboardService.teams();
+    this._matches = await LeaderboardService.matches();
     const arrayOverAll = this._teams.map(({ teamName }) => ({
       name: teamName,
       totalPoints: this.calculateTotalPoints(teamName),
@@ -127,11 +121,14 @@ export default class LeaderboardService {
       goalsBalance: this.calculateGoalsBalance(teamName),
       efficiency: this.calculateEfficiency(teamName),
     })).sort((a, b) => (
-      b.totalPoints - a.totalPoints
-      || b.totalVictories - a.totalVictories
+      b.totalPoints - a.totalPoints || b.totalVictories - a.totalVictories
       || b.goalsBalance - a.goalsBalance
       || b.goalsFavor - a.goalsFavor || a.goalsOwn - b.goalsOwn));
 
     return arrayOverAll;
   }
 }
+
+const leaderboard = new LeaderboardService();
+
+leaderboard.overAll();
