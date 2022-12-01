@@ -45,7 +45,7 @@ export interface IUserService {
 }
 
 export interface ILeaderboardService {
-  overAll(): Promise<IReturnFilterTimeRatings[]>
+  overAll(team: string | undefined): Promise<IReturnFilterTimeRatings[]>
 }
 
 export interface IParamsCreateMatches {
