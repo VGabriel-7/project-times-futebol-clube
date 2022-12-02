@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { createToken, validateTk } from '../utils/index';
-import { IUserService } from '../interfaces';
+import { IUserService } from '../interfaces/IFunctions';
 
 export default class UserController {
   constructor(private userService: IUserService) {}

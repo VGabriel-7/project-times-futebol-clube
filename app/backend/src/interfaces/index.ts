@@ -34,18 +34,14 @@ export interface IReturnPutMatches {
   inProgress: boolean;
 }
 
+export interface ITeams {
+  id: number;
+  teamName: string;
+}
+
 export interface IUserLogin {
   email: string;
   password: string;
-}
-
-export interface IUserService {
-  login(userLogin: IUserLogin): Promise<IJwt | boolean>
-  typeUser(id: number): Promise<IRole | null>
-}
-
-export interface ILeaderboardService {
-  overAll(team: string | undefined): Promise<IReturnFilterTimeRatings[]>
 }
 
 export interface IParamsCreateMatches {

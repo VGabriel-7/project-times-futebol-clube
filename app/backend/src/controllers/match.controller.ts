@@ -1,23 +1,25 @@
 import { Request, Response } from 'express';
+import { IMatchService } from '../interfaces/IFunctions';
 import { validateTk } from '../utils';
-import MatchService from '../services/match.service';
 
 export default class MatchController {
-  public static async getAllMatches(req: Request, res: Response) {
+  constructor(private matchService: IMatchService) {}
+
+  public async getAllMatches(req: Request, res: Response) {
     const { inProgress } = req.query;
 
     try {
       if (inProgress === 'true') {
-        const matchesInProgress = await MatchService.getAllMatchesInProgress();
+        const matchesInProgress = await this.matchService.getAllMatchesInProgress();
 
         return res.status(200).json(matchesInProgress);
       } if (inProgress === 'false') {
-        const closedMatches = await MatchService.getAllClosedMatches();
+        const closedMatches = await this.matchService.getAllClosedMatches();
 
         return res.status(200).json(closedMatches);
       }
 
-      const matches = await MatchService.getAllMatches();
+      const matches = await this.matchService.getAllMatches();
 
       return res.status(200).json(matches);
     } catch (err) {
@@ -25,13 +27,13 @@ export default class MatchController {
     }
   }
 
-  public static async createMatch(req: Request, res: Response) {
+  public async createMatch(req: Request, res: Response) {
     const { authorization } = req.headers;
 
     try {
       validateTk(authorization as string);
 
-      const matches = await MatchService.createMatch(req.body);
+      const matches = await this.matchService.createMatch(req.body);
 
       return res.status(201).json(matches);
     } catch ({ message }) {
@@ -40,20 +42,20 @@ export default class MatchController {
     }
   }
 
-  public static async endMatch(req: Request, res: Response) {
+  public async endMatch(req: Request, res: Response) {
     const { id } = req.params;
 
-    const finshedMatch = await MatchService.endMatch(Number(id));
+    const finshedMatch = await this.matchService.endMatch(Number(id));
 
     if (!finshedMatch) return res.status(400).json({ message: 'Match not found' });
 
     return res.status(200).json(finshedMatch);
   }
 
-  public static async updateMatchInProgress(req: Request, res: Response) {
+  public async updateMatchInProgress(req: Request, res: Response) {
     const { id } = req.params;
 
-    const updatedMatch = await MatchService.updateMatchInProgress(Number(id), req.body);
+    const updatedMatch = await this.matchService.updateMatchInProgress(Number(id), req.body);
 
     if (!updatedMatch) return res.status(404).json({ message: 'Match not found' });
 

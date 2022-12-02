@@ -1,19 +1,17 @@
+import { ITeams } from '../interfaces';
 import Team from '../database/models/TeamModel';
 
-interface ITeams {
-  id: number;
-  teamName: string;
-}
-
 export default class TeamService {
-  public static async getAllTeams(): Promise<ITeams[]> {
-    const teams = await Team.findAll();
+  private _team = Team;
+
+  public async getAllTeams(): Promise<ITeams[]> {
+    const teams = await this._team.findAll();
 
     return teams;
   }
 
-  public static async getTeam(id: number): Promise<ITeams | null> {
-    const team = await Team.findByPk(id);
+  public async getTeam(id: number): Promise<ITeams | null> {
+    const team = await this._team.findByPk(id);
 
     return team;
   }

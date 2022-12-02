@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { ILeaderboardService } from '../interfaces';
+import { ILeaderboardService } from '../interfaces/IFunctions';
 
 export default class LeaderboardController {
   constructor(private leaderboardService: ILeaderboardService) {}

@@ -9,8 +9,10 @@ import Match from '../database/models/MatchModel';
 import Team from '../database/models/TeamModel';
 
 export default class MatchService {
-  public static async getAllMatches(): Promise<Match[]> {
-    const matches = await Match.findAll({
+  private _match = Match;
+
+  public async getAllMatches(): Promise<Match[]> {
+    const matches = await this._match.findAll({
       include: [
         { model: Team, as: 'teamHome', attributes: { exclude: ['id'] } },
         { model: Team, as: 'teamAway', attributes: { exclude: ['id'] } },
@@ -20,8 +22,8 @@ export default class MatchService {
     return matches;
   }
 
-  public static async getAllMatchesInProgress(): Promise<Match[]> {
-    const matches = await Match.findAll({
+  public async getAllMatchesInProgress(): Promise<Match[]> {
+    const matches = await this._match.findAll({
       include: [
         { model: Team, as: 'teamHome', attributes: { exclude: ['id'] } },
         { model: Team, as: 'teamAway', attributes: { exclude: ['id'] } },
@@ -33,8 +35,8 @@ export default class MatchService {
     return matchesInProgress;
   }
 
-  public static async getAllClosedMatches(): Promise<Match[]> {
-    const closedMatches = await Match.findAll({
+  public async getAllClosedMatches(): Promise<Match[]> {
+    const closedMatches = await this._match.findAll({
       where: { inProgress: false },
       include: [
         { model: Team, as: 'teamHome', attributes: { exclude: ['id'] } },
@@ -45,14 +47,14 @@ export default class MatchService {
     return closedMatches;
   }
 
-  public static async createMatch({
+  public async createMatch({
     homeTeam,
     awayTeam,
     homeTeamGoals,
     awayTeamGoals,
   }: IParamsCreateMatches):
     Promise<IReturnPutMatches> {
-    const dataValues = await Match.create({
+    const dataValues = await this._match.create({
       homeTeam,
       awayTeam,
       homeTeamGoals,
@@ -63,9 +65,9 @@ export default class MatchService {
     return dataValues;
   }
 
-  public static async endMatch(id: number):
+  public async endMatch(id: number):
   Promise<IReturnUpdateMatches | boolean> {
-    const finshedMatch = await Match.update({ inProgress: 0 }, {
+    const finshedMatch = await this._match.update({ inProgress: 0 }, {
       where: { id },
     });
 
@@ -74,11 +76,11 @@ export default class MatchService {
     return false;
   }
 
-  public static async updateMatchInProgress(id: number, updates: IParamsUpdateMatchInProgress):
+  public async updateMatchInProgress(id: number, updates: IParamsUpdateMatchInProgress):
   Promise<IReturnMatchInProgress | boolean> {
     const { homeTeamGoals, awayTeamGoals } = updates;
 
-    const updatedMatch = await Match.update({ homeTeamGoals, awayTeamGoals }, {
+    const updatedMatch = await this._match.update({ homeTeamGoals, awayTeamGoals }, {
       where: { id },
     });
 
