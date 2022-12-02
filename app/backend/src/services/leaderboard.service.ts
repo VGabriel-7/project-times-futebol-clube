@@ -6,6 +6,16 @@ import Match from '../database/models/MatchModel';
 type team = 'teamHome' | 'teamAway';
 type teamGoals = 'homeTeamGoals' | 'awayTeamGoals';
 
+type Keys = 'totalPoints' |
+'totalGames' |
+'totalVictories' |
+'totalDraws' |
+'totalLosses' |
+'goalsFavor' |
+'goalsOwn' |
+'goalsBalance' |
+'efficiency';
+
 export default class LeaderboardService {
   private _user = User;
   private _matches: Match[] = [];
@@ -170,10 +180,54 @@ export default class LeaderboardService {
     return arrayOverAllHome;
   }
 
-  public async overAll(team: string | undefined): Promise<IReturnFilterTimeRatings[]> {
+  static genericKeyCalc(teams: IReturnFilterTimeRatings[], key: Keys, name: string): number {
+    return teams.reduce((acc, team) => (team.name === name ? acc + team[key] : acc + 0), 0);
+  }
+
+  static removeDuplication(array: IReturnFilterTimeRatings[]): IReturnFilterTimeRatings[] {
+    const setTeam = new Set();
+
+    const arrayWithoutDuplication = array.filter((team) => {
+      const duplicatedPerson = setTeam.has(team.name);
+      setTeam.add(team.name);
+      return !duplicatedPerson;
+    });
+
+    return arrayWithoutDuplication;
+  }
+
+  static calcEfficiencyOverAll(teams: IReturnFilterTimeRatings[], name: string): number {
+    const totalGames = LeaderboardService.genericKeyCalc(teams, 'totalGames', name);
+    const totalPoints = LeaderboardService.genericKeyCalc(teams, 'totalPoints', name);
+    return Number(((totalPoints / (totalGames * 3)) * 100).toFixed(2));
+  }
+
+  public async overAllHomeAndAway(): Promise<IReturnFilterTimeRatings[]> {
+    const teamsHome = await this.overAllTeams('teamHome', 'homeTeamGoals', 'awayTeamGoals');
+    const teamsAway = await this.overAllTeams('teamAway', 'awayTeamGoals', 'homeTeamGoals');
+    const teams = [...teamsHome, ...teamsAway];
+    const overAllTeams = teams.reduce((acc, team) => {
+      const objTeam = { name: team.name,
+        totalPoints: LeaderboardService.genericKeyCalc(teams, 'totalPoints', team.name),
+        totalGames: LeaderboardService.genericKeyCalc(teams, 'totalGames', team.name),
+        totalVictories: LeaderboardService.genericKeyCalc(teams, 'totalVictories', team.name),
+        totalDraws: LeaderboardService.genericKeyCalc(teams, 'totalDraws', team.name),
+        totalLosses: LeaderboardService.genericKeyCalc(teams, 'totalLosses', team.name),
+        goalsFavor: LeaderboardService.genericKeyCalc(teams, 'goalsFavor', team.name),
+        goalsOwn: LeaderboardService.genericKeyCalc(teams, 'goalsOwn', team.name),
+        goalsBalance: LeaderboardService.genericKeyCalc(teams, 'goalsBalance', team.name),
+        efficiency: LeaderboardService.calcEfficiencyOverAll(teams, team.name) };
+      return [...acc, objTeam];
+    }, [] as IReturnFilterTimeRatings[]);
+    return LeaderboardService.reorder(LeaderboardService.removeDuplication(overAllTeams));
+  }
+
+  public async overAll(team: team | undefined): Promise<IReturnFilterTimeRatings[]> {
     if (team === 'teamHome') {
       return this.overAllTeams(team, 'homeTeamGoals', 'awayTeamGoals');
+    } if (team === 'teamAway') {
+      return this.overAllTeams(team, 'awayTeamGoals', 'homeTeamGoals');
     }
-    return this.overAllTeams('teamAway', 'awayTeamGoals', 'homeTeamGoals');
+    return this.overAllHomeAndAway();
   }
 }
