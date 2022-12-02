@@ -8,11 +8,13 @@ import App from '../app';
 import { Response } from 'superagent';
 import Team from '../database/models/TeamModel';
 import {
+  responseLeaderboard,
   responseLeaderboardAway,
   responseLeaderboardHome,
   returnFindAllMatches,
   returnFindAllTeams,
-  returnFindAllTeamsAway} from './mocks/mockLeaderboard';
+  returnFindAllTeamsAway,
+  returnFindAllTeamsLeaderboard} from './mocks/mockLeaderboard';
 import Match from '../database/models/MatchModel';
 
 chai.use(chaiHttp);
@@ -53,5 +55,18 @@ describe('Rota de /leaderboard/home', () => {
 
     expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);
     expect(chaiHttpResponse.body).to.deep.equal(responseLeaderboardAway);
+  });
+
+  it('Retorna um array de classificacoes de todos os teams e status 200', async () => {
+    sinon
+      .stub(Team, "findAll")
+      .resolves(returnFindAllTeamsLeaderboard as Team[]);
+    sinon
+      .stub(Match, "findAll")
+      .resolves(returnFindAllMatches as Match[]);
+    chaiHttpResponse = await chai.request(app).get('/leaderboard');
+
+    expect(chaiHttpResponse.status).to.be.eq(HTTP_STATUS_OK);
+    expect(chaiHttpResponse.body).to.deep.equal(responseLeaderboard);
   });
 });
